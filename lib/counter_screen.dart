@@ -1,6 +1,7 @@
+import 'package:cubit_and_bloc/cubit/counter_cubit.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CounterScreen extends StatefulWidget {
   const CounterScreen({Key? key, required this.title}) : super(key: key);
@@ -12,12 +13,10 @@ class CounterScreen extends StatefulWidget {
 }
 
 class _CounterScreenState extends State<CounterScreen> {
-  int _counter = 0;
-
   void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    BlocProvider.of<CounterCubit>(context).increments();
+   // todo : or Using this
+  // context.read<CounterCubit>().increments()  ;
   }
 
   @override
@@ -33,9 +32,19 @@ class _CounterScreenState extends State<CounterScreen> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            BlocListener(
+              listener: ((context, state) {
+                if (state is CounterIsIncremented) {
+                  Fluttertoast.showToast(msg: 'Counter ${BlocProvider.of<CounterCubit>(context).counter.toString()}') 
+                }
+              }),
+              child: BlocBuilder<CounterCubit, CounterState>(
+                  builder: (_, counterState) {
+                return Text(
+                  BlocProvider.of<CounterCubit>(context).counter.toString(),
+                  style: Theme.of(context).textTheme.headline4,
+                );
+              }),
             ),
           ],
         ),
